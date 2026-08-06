@@ -58,10 +58,13 @@ of every score, badge, and table column.
 
 ### 5. Add the Pine Script indicator
 
-Open `Qullamaggie_Setups.pine` in TradingView's Pine Editor (or use the
-published version — link once live: `<your published script URL>`), add it
-to any chart, and it computes the same 0–100 scores directly on the chart
-with visual setup boxes and a status table.
+1. Open the [`Qullamaggie_Setups.pine`](Qullamaggie_Setups.pine) file on GitHub and copy its full contents
+2. In TradingView, open **Pine Editor** (bottom toolbar of any chart)
+3. Paste the code in, then click **Add to Chart**
+
+That's it — it computes the same 0–100 scores as the Python scanner directly
+on the chart, with visual setup boxes and a status table. No TradingView
+publish/subscription needed; this works on a free TradingView account.
 
 ## Repo contents
 
