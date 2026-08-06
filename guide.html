@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Qullamaggie Scanner — Guide</title>
+<style>
+  :root { --bg:#0f1115; --panel:#171a21; --line:#262b36; --text:#e6e8ec; --muted:#9aa2b1;
+          --green:#3ecf8e; --red:#ff5c5c; --amber:#f5b942; --accent:#6ea8fe; }
+  * { box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:-apple-system,Segoe UI,Roboto,sans-serif;
+         margin:0; padding:32px; max-width:920px; margin-left:auto; margin-right:auto; line-height:1.55; }
+  h1 { font-size:24px; margin:0 0 6px; }
+  h2 { font-size:18px; margin:0 0 4px; border-bottom:1px solid var(--line); padding-bottom:8px; }
+  h3 { font-size:14.5px; margin:20px 0 6px; color:var(--accent); }
+  .sub { color:var(--muted); margin-bottom:20px; font-size:13.5px; }
+  .toolbar { display:flex; gap:10px; margin-bottom:28px; flex-wrap:wrap; }
+  .btn { display:inline-block; padding:9px 16px; border-radius:8px; font-size:13.5px; font-weight:600;
+         text-decoration:none; border:1px solid var(--line); }
+  .btn-primary { background:var(--accent); color:#0b1220; border-color:var(--accent); }
+  .btn-secondary { background:var(--panel); color:var(--text); }
+  section { background:var(--panel); border:1px solid var(--line); border-radius:10px;
+            padding:20px 24px; margin-bottom:22px; }
+  p { margin:0 0 10px; font-size:14px; color:var(--text); }
+  p.muted { color:var(--muted); font-size:13px; }
+  table.flags { width:100%; border-collapse:collapse; margin:12px 0; font-size:13.5px; }
+  table.flags th { text-align:left; color:var(--muted); font-weight:600; padding:8px 10px;
+                    border-bottom:1px solid var(--line); }
+  table.flags td { padding:9px 10px; border-bottom:1px solid rgba(255,255,255,.04); vertical-align:top; }
+  .flag-letter { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px;
+                 border-radius:6px; background:rgba(110,168,254,.15); color:var(--accent); font-weight:700;
+                 font-size:13px; }
+  .sbadge { display:inline-block; padding:3px 9px; border-radius:6px; font-size:11.5px; font-weight:700; }
+  .b-setup { background:rgba(62,207,142,.18); color:var(--green); }
+  .b-watch { background:rgba(245,185,66,.18); color:var(--amber); }
+  .b-monitor { background:rgba(110,168,254,.15); color:var(--accent); }
+  .b-none { background:rgba(154,162,177,.1); color:var(--muted); }
+  ul, ol { margin:8px 0 10px; padding-left:20px; }
+  li { margin-bottom:5px; font-size:13.5px; }
+  .callout { border-left:3px solid var(--amber); background:rgba(245,185,66,.08); padding:10px 14px;
+             border-radius:0 6px 6px 0; font-size:13px; margin:12px 0; }
+  .callout.danger { border-left-color:var(--red); background:rgba(255,92,92,.08); }
+  .callout.good { border-left-color:var(--green); background:rgba(62,207,142,.08); }
+  code { background:rgba(255,255,255,.06); padding:1px 6px; border-radius:4px; font-size:12.5px; }
+  footer { color:var(--muted); font-size:11.5px; margin-top:30px; text-align:center; }
+  .toc { display:flex; flex-wrap:wrap; gap:8px 16px; margin-bottom:26px; font-size:13px; }
+  .toc a { color:var(--muted); text-decoration:none; }
+  .toc a:hover { color:var(--accent); }
+  .lynch-card { border:1px solid var(--line); border-radius:8px; padding:14px 16px; margin-bottom:12px;
+                background:rgba(255,255,255,.015); }
+  .lynch-head { display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:14px; }
+  .lynch-head .muted { color:var(--muted); font-size:12.5px; font-weight:400; }
+  .fail-line { border-left:3px solid var(--red); background:rgba(255,92,92,.06); padding:8px 12px;
+               border-radius:0 6px 6px 0; font-size:13px; margin:8px 0; }
+  .pass-line { border-left:3px solid var(--green); background:rgba(62,207,142,.06); padding:8px 12px;
+               border-radius:0 6px 6px 0; font-size:13px; margin:8px 0; }
+</style>
+</head>
+<body>
+
+  <h1>Qullamaggie Scanner — Guide</h1>
+  <div class="sub">What every score, badge, and filter actually measures, and what to look out for before you act on it.</div>
+
+  <div class="toolbar">
+    <a href="dashboard_latest.html" class="btn btn-primary">⬅ Back to latest scan</a>
+    <a href="#lynch" class="btn btn-secondary">Jump to 2LYNCH checklist</a>
+  </div>
+
+  <div class="toc">
+    <a href="#overview">Overview &amp; two-stage workflow</a>
+    <a href="#workflow">How to use this, end to end</a>
+    <a href="#badges">Badge tiers</a>
+    <a href="#recent">Recently Triggered</a>
+    <a href="#regime">Market regime</a>
+    <a href="#liquidity">Liquidity filters</a>
+    <a href="#breakout">Breakout score</a>
+    <a href="#lynch">2LYNCH checklist</a>
+    <a href="#ep">Episodic Pivot score</a>
+    <a href="#pshort">Parabolic Short score</a>
+    <a href="#plong">Parabolic Long</a>
+    <a href="#entries">Entries, stops &amp; exits</a>
+    <a href="#quickref">Quick reference</a>
+    <a href="#pitfalls">Common pitfalls</a>
+  </div>
+
+  <section id="overview">
+    <h2>Overview: this is Stage 1 of 2</h2>
+    <p>This scanner's whole job is to shrink a universe of hundreds of tickers down to a short list worth
+      actually looking at. It is <strong>not</strong> a buy signal by itself.</p>
+    <p class="muted">Stage 1 (this scanner): scores the whole market nightly on the numeric shape of a setup —
+      momentum, tightness, volume, extension. Stage 2 (TradingView + the companion Pine indicator): you look at
+      the actual chart for each candidate and judge the things a number can't capture — is the consolidation
+      genuinely orderly, is this a young trend or an aging one, does price action look coiled or sloppy.</p>
+    <p class="muted">Stage 2's indicator now shows these <em>same</em> 0-100 scores directly on the chart (Breakout
+      Score, EP Score, P-Short Score rows in its status table), computed with the same tier thresholds as this
+      scanner — so a ticker's score here should match what you see on the chart for the same bar. The boolean
+      SIGNAL markers (BO/EP/P-SHORT/P-LONG) are a separate, stricter all-or-nothing gate on top of the score, not
+      a replacement for it — a ticker can score well without the marker firing.</p>
+    <div class="callout">
+      Every trader who has built something like this — from Stockbee's Pradeep Bonde (whose Momentum Burst /
+      Episodic Pivot ideas this setup borrows from) to the various TradingView/ChartMill implementations — says
+      the same thing: a numeric scan finds candidates shaped like the setup, it doesn't confirm the setup. Chart
+      confirmation in Stage 2 is not optional.
+    </div>
+  </section>
+
+  <section id="workflow">
+    <h2>How to use this, end to end</h2>
+    <p>The scanner and the indicator are two steps of one habit, not two separate tools. A typical session looks
+      like this:</p>
+    <ol>
+      <li><strong>Run the scanner after the close.</strong> It scores the whole liquidity-filtered universe and
+        writes out the CSV + HTML dashboard, sorted by score within each setup.</li>
+      <li><strong>Scan the dashboard top-down, one setup at a time.</strong> Prioritize <span class="sbadge b-setup">SETUP!</span>
+        and <span class="sbadge b-watch">WATCH</span> names first — Monitor-tier names are worth a glance but rarely
+        worth acting on same-day. Also check the "Recently Triggered" table for anything that fired in the last
+        few days and might still be actionable, even if it's no longer scoring high today.</li>
+      <li><strong>Open each candidate on TradingView</strong> with the Pine indicator loaded. Confirm the score in
+        the status table roughly matches what you saw in the dashboard for that ticker.</li>
+      <li><strong>Walk the chart checklist:</strong> badge/score, 2LYNCH count if it's a Breakout candidate, the
+        shape of the Consolidation/Linearity/Parabolic boxes (see the sections below for how to read each), and
+        the market regime badge.</li>
+      <li><strong>If it holds up, plan the trade before anything else</strong> — entry trigger, stop level, and
+        size (via the Position Sizing Calculator on the dashboard). See "Entries, stops &amp; exits" below.</li>
+      <li><strong>If it's not quite there, set an alert instead of forcing it.</strong> WATCH/Monitor names are
+        meant to be revisited as they develop, not chased into a lower-quality entry.</li>
+      <li><strong>Log what you actually did</strong> — entry, stop, size, setup type — somewhere outside the tool.
+        The scanner has no memory of which signals you acted on or how they played out.</li>
+    </ol>
+    <p class="muted">This loop is meant to run nightly for the scan, and live/intraday only for confirming an
+      already-flagged candidate — not for discovering new ideas by staring at random charts during the day.</p>
+  </section>
+
+  <section id="badges">
+    <h2>Badge tiers</h2>
+    <p>Every setup gets a 0-100 score instead of a plain pass/fail, so you can see "close but not quite" candidates,
+      not just fully-confirmed ones.</p>
+    <table class="flags">
+      <tr><th>Score</th><th>Badge</th><th>What it means</th><th>What to do</th></tr>
+      <tr><td>80-100</td><td><span class="sbadge b-setup">SETUP!</span></td>
+          <td>Very close to a full textbook setup</td><td>Check the chart now, set an alert, size it up</td></tr>
+      <tr><td>60-79</td><td><span class="sbadge b-watch">WATCH</span></td>
+          <td>Getting there, missing 1-2 criteria</td><td>Add to watchlist, check daily for improvement</td></tr>
+      <tr><td>40-59</td><td><span class="sbadge b-monitor">Monitor</span></td>
+          <td>Has some of the right characteristics</td><td>Worth tracking, not an active candidate yet</td></tr>
+      <tr><td>0-39</td><td><span class="sbadge b-none">-</span></td>
+          <td>Doesn't resemble the setup</td><td>Ignore for now</td></tr>
+    </table>
+    <p class="muted">A high score means the numbers line up. It doesn't mean the chart looks clean — always look
+      before you act, especially on WATCH/Monitor names where something is still missing by definition.</p>
+  </section>
+
+  <section id="recent">
+    <h2>Recently Triggered</h2>
+    <p>Sits right below the legend on the dashboard, above the four setup tables. It answers a specific gap: a
+      SETUP!-caliber hit can genuinely disappear from tomorrow's scan even though nothing went wrong — most
+      commonly an Episodic Pivot, whose score is built almost entirely from <em>today's</em> gap and volume
+      (see the Episodic Pivot section below). The day after the gap, there's no new gap and no repeat volume
+      surge, so the score naturally collapses even though the stock may still be perfectly tradeable a day or
+      two later.</p>
+    <p>This table keeps any ticker that scored <strong>80 or higher</strong> on <strong>any</strong> of the
+      three scored setups — Breakout, Episodic Pivot, or Parabolic Short — visible for a few extra days after
+      the day it actually fired, even once today's live score has dropped back down. It's deliberately limited
+      to SETUP!-caliber hits; WATCH/Monitor-tier scores are never tracked here, even briefly. It does not
+      affect scoring in any way; it's a memory layer sitting on top of scores that are already computed
+      elsewhere.</p>
+    <table class="flags">
+      <tr><th>Column</th><th>What it shows</th></tr>
+      <tr><td><strong>type</strong></td><td>Which setup it fired on (Breakout / Episodic Pivot / Parabolic Short)</td></tr>
+      <tr><td><strong>score / Setup</strong></td><td>The score and badge from the day it last qualified — not
+        today's (possibly decayed) live score</td></tr>
+      <tr><td><strong>first_triggered</strong></td><td>The first day this ticker/setup pair hit 80+, without a
+        gap in between</td></tr>
+      <tr><td><strong>last_triggered</strong></td><td>The most recent day it qualified. Re-firing (e.g. 90+
+        three days running) resets this and keeps the entry "alive"</td></tr>
+      <tr><td><strong>days_since</strong></td><td>Days since last_triggered. Once this exceeds the lookback
+        window (5 days by default, set via <code>recent_triggers_lookback_days</code> in the scanner), the row
+        drops off automatically on the next scan</td></tr>
+    </table>
+    <p class="muted">The 80 threshold is set via <code>recent_triggers_min_score</code> in the scanner's
+      DEFAULTS — deliberately matching the SETUP! badge boundary exactly. Nothing in the WATCH/Monitor range
+      appears here by design; this table is for names that hit a genuine, full-strength setup, not everything
+      that ever showed some promise.</p>
+  </section>
+
+  <section id="regime">
+    <h2>Market regime badge</h2>
+    <p>SPY's 10-day SMA vs 20-day SMA, shown at the top of the dashboard. <strong>Bullish</strong> = 10-day above
+      20-day. <strong>Bearish/caution</strong> = 10-day below 20-day.</p>
+    <p class="muted">This isn't a hard filter on the scan results — candidates still show up either way — but it's
+      context you should weigh heavily. Breakouts and EPs statistically work much better when the broad market is
+      healthy; several drawdowns in trend-following momentum strategies (including ones Kris himself has talked
+      about) trace back to ignoring a deteriorating market regime and continuing to trade setups at full size
+      anyway. Treat a bearish badge as a signal to trade smaller, be pickier, and expect a higher failure rate.</p>
+  </section>
+
+  <section id="liquidity">
+    <h2>Liquidity filters (apply to every setup)</h2>
+    <p>Before any setup is even scored, a ticker has to clear basic tradeability bars:</p>
+    <ul>
+      <li><strong>ADR% ≥ 3%</strong> — average daily range as a percent of price. Low-ADR stocks don't move enough
+        intraday to be worth the setup's risk/reward; this is the single most Qullamaggie-specific filter here.</li>
+      <li><strong>Avg dollar volume ≥ $5M</strong> — filters out stocks too thin to actually get in and out of at size.</li>
+      <li><strong>Price ≥ $2</strong> — very low-priced stocks behave differently (wider relative spreads, more
+        manipulation-prone) and usually aren't the kind of name this setup family targets.</li>
+    </ul>
+    <p class="muted">These thresholds are conservative defaults, not gospel — they live in the <code>DEFAULTS</code>
+      dict near the top of the script if you want to loosen or tighten them.</p>
+  </section>
+
+  <section id="breakout">
+    <h2>Breakout score (0-100)</h2>
+    <p>Rewards a stock that already made a real move, pulled back into an orderly base hugging its moving averages,
+      and is now pushing higher again on volume.</p>
+    <table class="flags">
+      <tr><th>Bucket</th><th>Max pts</th><th>What it's checking</th><th>What to look out for</th></tr>
+      <tr><td><strong>Momentum</strong></td><td>35</td>
+          <td>1-month and 3-month price return</td>
+          <td>A huge score here with a flat/messy chart usually means the "move" was one or two gap days, not a
+            real trend — open the chart before trusting this alone.</td></tr>
+      <tr><td><strong>Trend Position</strong></td><td>20</td>
+          <td>EMA10 is rising (not just "above") AND full bullish MA stack (EMA10 &gt; EMA20 &gt; SMA50)</td>
+          <td>Deliberately stricter than a flat "close above the MA" check — a stock barely poking above a flat
+            EMA10 gets zero credit here now, only genuine slope + alignment counts. (Mirrors the same
+            slope/stack logic Minervini's Trend Template uses, which Kris's own approach draws on.)</td></tr>
+      <tr><td><strong>MA Surfing</strong></td><td>25</td>
+          <td>How tightly price is hugging the 10/20-day EMA</td>
+          <td>This is the "orderly consolidation" proxy. High points here + a chart that's actually choppy (not
+            genuinely tight) is exactly what the 2LYNCH checks below exist to catch.</td></tr>
+      <tr><td><strong>Volume &amp; Extension</strong></td><td>20</td>
+          <td>Volume multiple vs average, % of 52-week high</td>
+          <td>A stock already at 90%+ of its 52-week high scores well here — but check it's not already extended
+            5+ days into the move with no pause left.</td></tr>
+    </table>
+    <div class="callout">
+      The Breakout score alone can be fooled by a stock that's just been trending smoothly upward for months with
+      no real base — it'll score high on Momentum/Trend/Surfing without ever having a genuine "breakout" moment.
+      This is exactly what the 2LYNCH checklist below is for.
+    </div>
+  </section>
+
+  <section id="lynch">
+    <h2>2LYNCH consolidation-quality checklist</h2>
+    <p>Borrowed from Pradeep Bonde ("Stockbee") — the trader whose Momentum Burst and Episodic Pivot ideas
+      Qullamaggie has credited as the origin of his own EP setup. Where the 0-100 score above measures
+      <em>momentum and position</em>, 2LYNCH specifically judges <em>consolidation quality</em> — the difference
+      between a clean, low-risk base and a sloppy one that just happens to score well numerically.</p>
+    <p>Only shown on the Breakout table. Each ticker gets a count out of 6 (<code>lynch_count</code>) and a string
+      showing exactly which letters passed (<code>lynch_flags</code>, e.g. <code>"2LNH"</code> means it passed
+      2/L/N/H but failed Y/C).</p>
+    <div class="callout good">
+      <strong>Short answer: yes, more is better.</strong> All 6 passing is the cleanest possible consolidation by
+      this checklist's definition — you're not trying to hit some specific subset, you want as many letters lit
+      up as possible. See the "How to use lynch_count in practice" tiers below for rough guidance on what
+      different counts mean in terms of chart quality.
+    </div>
+
+    <div class="lynch-card">
+      <div class="lynch-head"><span class="flag-letter">2</span>
+        <strong>Not already up two days in a row going into today</strong></div>
+      <p>Avoids chasing a move that's already run two straight green days — entries right after a 2-day thrust
+        have worse follow-through than entries after a pause.</p>
+      <p class="fail-line"><strong>Fail looks like:</strong> two consecutive green candles immediately before
+        today's bar, with today making it a third.</p>
+      <p class="pass-line"><strong>Pass looks like:</strong> today follows a flat/red day, or is itself only the
+        first up-day after the base.</p>
+    </div>
+
+    <div class="lynch-card">
+      <div class="lynch-head"><span class="flag-letter">L</span>
+        <strong>Linearity of the prior move</strong> <span class="muted">(efficiency ratio &ge; 0.35)</span></div>
+      <p>A move that went mostly in one direction with few big reversals is a "clean trend" — easier to judge,
+        easier to hold. A jagged, back-and-forth move with the same net gain is much lower quality even though
+        the raw % return looks identical.</p>
+      <p class="fail-line"><strong>Fail looks like:</strong> a saw-tooth chart, big up days wiped out by big
+        down days, net progress only from a couple of outlier candles.</p>
+      <p class="pass-line"><strong>Pass looks like:</strong> a staircase — mostly steady higher lows and higher
+        highs with shallow pullbacks.</p>
+    </div>
+
+    <div class="lynch-card">
+      <div class="lynch-head"><span class="flag-letter">Y</span>
+        <strong>Young trend</strong> <span class="muted">(hasn't been above its 50-day SMA for more than ~90 bars)</span></div>
+      <p>The 1st or 2nd breakout out of a base is statistically a better risk/reward than the 4th or 5th — each
+        subsequent breakout attempt out of an aging trend has more overhead supply and more exhausted buyers
+        above it.</p>
+      <p class="fail-line"><strong>Fail looks like:</strong> the stock has been trending for the better part of
+        a year already and this is yet another breakout attempt deep into an extended run.</p>
+      <p class="pass-line"><strong>Pass looks like:</strong> a relatively fresh trend, ideally still within its
+        first few months off the lows.</p>
+    </div>
+
+    <div class="lynch-card">
+      <div class="lynch-head"><span class="flag-letter">N</span>
+        <strong>Narrow-range or down day immediately before the trigger</strong></div>
+      <p>Wants to see the stock coiling — volatility contracting — right before it breaks out, not already
+        thrusting hard the day before (which suggests the move already started without you).</p>
+      <p class="fail-line"><strong>Fail looks like:</strong> yesterday was already a big, wide-range up day —
+        today's "breakout" is really day two of a move already underway.</p>
+      <p class="pass-line"><strong>Pass looks like:</strong> yesterday was quiet, narrow, or slightly red — a
+        coiled spring, not an already-released one.</p>
+    </div>
+
+    <div class="lynch-card">
+      <div class="lynch-head"><span class="flag-letter">C</span>
+        <strong>Consolidation quality</strong>
+        <span class="muted">(&le;1 sharp &ge;4% down day inside the base, plus volume dried up vs. the prior move)</span></div>
+      <p>This is the core "orderly base" check. A base riddled with sharp down days is one where weak hands are
+        still getting shaken out violently — not the calm, low-volume drift that precedes the best breakouts.</p>
+      <p class="fail-line"><strong>Fail looks like:</strong> multiple red days of 4%+ inside the base, and
+        volume during the base is still as heavy as during the original move (no drying up).</p>
+      <p class="pass-line"><strong>Pass looks like:</strong> a quiet, boring, low-volume sideways drift with at
+        most one rough day.</p>
+    </div>
+
+    <div class="lynch-card">
+      <div class="lynch-head"><span class="flag-letter">H</span>
+        <strong>Closes in the top 30% of the trigger bar's range</strong></div>
+      <p>A breakout that closes near its high shows buyers were in control into the close. A breakout that
+        closes in the lower half of its range — even if it technically broke out intraday — is a much weaker
+        signal and more likely to fail the next day.</p>
+      <p class="fail-line"><strong>Fail looks like:</strong> a long upper wick, price pushed higher intraday
+        then faded hard into the close.</p>
+      <p class="pass-line"><strong>Pass looks like:</strong> a strong close at or near the day's high.</p>
+    </div>
+
+    <h3>How to use lynch_count in practice</h3>
+    <ul>
+      <li><strong>5-6/6</strong> — high-quality, textbook-shaped setup. Worth prioritizing over a same-scored
+        candidate with a lower count.</li>
+      <li><strong>3-4/6</strong> — mixed. Open the chart and see which specific letters failed and whether that
+        matters for your read of the setup.</li>
+      <li><strong>0-2/6</strong> — the shape is probably wrong even if the 0-100 score looks decent. This is the
+        classic "numbers say breakout, chart says something else" case.</li>
+    </ul>
+    <p class="muted">Run the scanner with <code>--strict</code> to automatically require <code>lynch_count &ge; 4</code>
+      before a Breakout signal counts as confirmed — a meaningfully more aggressive filter than the raw score alone.</p>
+    <div class="callout danger">
+      2LYNCH is a numeric approximation of a chart-judgment checklist, same as everything else here. A stock can
+      pass 6/6 and still have a bad chart for reasons these specific checks don't cover (e.g. a huge round-number
+      resistance level right above, or an earnings date landing inside your hold period). It narrows the pile, it
+      doesn't replace looking.
+    </div>
+  </section>
+
+  <section id="ep">
+    <h2>Episodic Pivot score (0-100)</h2>
+    <p>Rewards a large, catalyst-driven gap on heavy volume, especially when the stock wasn't already extended
+      going in.</p>
+    <table class="flags">
+      <tr><th>Bucket</th><th>Max pts</th><th>What it's checking</th><th>What to look out for</th></tr>
+      <tr><td><strong>Gap/Move</strong></td><td>40</td><td>Size of today's gap</td>
+          <td>Bigger isn't always better — a 30%+ gap on a small/illiquid name can be as much a trap as an
+            opportunity. Check what actually caused it (earnings, guidance, FDA news, etc.) before assuming
+            it's tradeable.</td></tr>
+      <tr><td><strong>Volume Surge</strong></td><td>25</td><td>Volume vs. average</td>
+          <td>Confirms institutional participation, not just retail chasing a headline.</td></tr>
+      <tr><td><strong>Prior Base</strong></td><td>20</td><td>How flat the prior 3 months were (magnitude of
+            move, either direction)</td>
+          <td>A quiet base before the gap means this is a genuine surprise, not a continuation of an already-known
+            story. A stock that already ran 50%+ up <em>or already crashed 50%+ down</em> in the prior 3 months
+            scores low here even with a big gap today — a deep prior decline isn't "flat" just because it's
+            negative.</td></tr>
+      <tr><td><strong>Breakout</strong></td><td>15</td><td>Is price now above its 20-day high</td>
+          <td>Confirms the gap actually cleared recent resistance, not just a big move still trapped in a range.</td></tr>
+    </table>
+    <div class="callout">
+      EPs are event-driven — the catalyst matters as much as the numbers. Always check <em>why</em> the gap
+      happened before trusting the score. A gap on genuine positive news behaves very differently from a gap on
+      a rumor or a small-float short squeeze.
+    </div>
+  </section>
+
+  <section id="pshort">
+    <h2>Parabolic Short score (0-100)</h2>
+    <p>Rewards an extreme, fast, overextended move — the kind that eventually mean-reverts hard.</p>
+    <table class="flags">
+      <tr><th>Bucket</th><th>Max pts</th><th>What it's checking</th><th>What to look out for</th></tr>
+      <tr><td><strong>Massive Gain</strong></td><td>35</td><td>1-month return</td>
+          <td>The higher this scores, the more "unsustainable" the move looks numerically — but unsustainable
+            moves can keep going for a while before they crack. This is not a timing signal by itself.</td></tr>
+      <tr><td><strong>Consecutive Up Days</strong></td><td>25</td><td>Up-day streak length</td>
+          <td>Long streaks (7+) are rare and historically associated with exhaustion, but shorting into strength
+            purely on streak length is one of the highest-risk trades in this entire scanner.</td></tr>
+      <tr><td><strong>Extension from MA</strong></td><td>25</td><td>% above the 10-day SMA</td>
+          <td>Measures how far price has stretched from its own short-term trend — the further, the more likely
+            (not certain) a snapback.</td></tr>
+      <tr><td><strong>Volatility</strong></td><td>15</td><td>ADR%</td>
+          <td>High-ADR names swing hard both ways — this setup needs that volatility to work, but it also means
+            outsized risk if you're on the wrong side of a continuation.</td></tr>
+    </table>
+    <div class="callout danger">
+      Shorting parabolic moves is widely considered the highest-risk setup in this entire family, Qullamaggie
+      included — squeezes can extend far past what looks "rational," and a high score here is really flagging
+      "extreme," not "about to reverse." Size accordingly, and treat this table as the last one to trade off of,
+      not the first.
+    </div>
+  </section>
+
+  <section id="plong">
+    <h2>Parabolic Long (post-crash reversal)</h2>
+    <p>A boolean signal only — no 0-100 score defined for this one. Fires when a stock had a genuine "crash"
+      (steep drop, consecutive down days, stretched far below its MA) within the last few bars, and today shows
+      a green reversal candle.</p>
+    <div class="callout">
+      This is the least well-defined setup in the scanner — the source material describes it qualitatively rather
+      than with hard numeric rules, so this is a heuristic approximation more than the other three. Treat any hit
+      here as a starting point for chart review, not a confirmed candidate.
+    </div>
+  </section>
+
+  <section id="entries">
+    <h2>Entries, stops &amp; exits</h2>
+    <p>The scanner and indicator find candidates — everything below is what to actually do once one clears. This
+      is Kris's own stated trade-management approach, condensed and mapped onto this tool's setups. None of it is
+      enforced in code; it's judgment you apply on top of a badge.</p>
+
+    <h3>The rule underneath all of this</h3>
+    <p>Cut losers fast, let winners run. Every entry, stop, and exit rule below exists to enforce that one
+      asymmetry — a small, fast, well-defined loss on the trades that don't work, against an open-ended trail on
+      the ones that do.</p>
+
+    <h3>Entry timing, by setup</h3>
+    <table class="flags">
+      <tr><th>Setup</th><th>Typical trigger</th><th>Notes</th></tr>
+      <tr><td><strong>Breakout</strong></td>
+          <td>The breakout bar itself, as price clears the consolidation high on above-average volume — or the
+            next bar if you missed the exact break</td>
+          <td>Don't chase a breakout that's already extended several days past the actual break. That's the
+            2LYNCH "Y: young trend" check failing for a reason.</td></tr>
+      <tr><td><strong>Episodic Pivot</strong></td>
+          <td>The gap day itself, or the first tight 1-3 day pause immediately after the gap</td>
+          <td>Entering into the gap directly is higher risk/reward than waiting for the pause afterward; waiting
+            risks missing the move if price never comes back down to a buyable level.</td></tr>
+      <tr><td><strong>Parabolic Short</strong></td>
+          <td>Not the high score by itself — wait for the first real break of trend (a close below a short EMA,
+            or the first sharp red day after extreme extension)</td>
+          <td>Shorting strength directly, on score alone, is how this setup blows accounts up. The score flags a
+            candidate; it is not an entry signal.</td></tr>
+      <tr><td><strong>Parabolic Long</strong></td>
+          <td>The reversal candle itself (green close after the crash + stretch conditions), or next-day
+            confirmation</td>
+          <td>The least-defined setup in the tool (see the Parabolic Long section above) — treat entries here as
+            higher-uncertainty than the other three.</td></tr>
+    </table>
+
+    <h3>Stops</h3>
+    <p>Kris's stated stop rule is a specific price level, not a fixed percentage or multiple: the <strong>low of
+      the breakout/entry day</strong>, or <strong>just below the low of the consolidation/base</strong> that
+      preceded it — whichever gives the tighter, more defensible risk. If that stop implies more risk than your
+      sizing rules allow, the answer is to size down or skip the trade, not to move the stop further away.</p>
+    <div class="callout danger">
+      The dashboard's Position Sizing Calculator currently uses an ADR%-multiple as a <em>proxy</em> for this stop
+      distance, since that's the only figure already computed for every row. It is <strong>not</strong> the
+      literal rule above — it's a convenient stand-in. Treat the calculator's Stop column as a rough sizing
+      estimate, and set your actual stop from the chart (low of day / low of base) before placing the trade.
+    </div>
+
+    <h3>Sizing</h3>
+    <p>Covered in more detail on the dashboard itself, but as a reminder: risk 0.25-1% of account per trade (up to
+      roughly 1.5% on smaller accounts), and never let a single position's value exceed about 30% of the account
+      overnight. The Position Sizing Calculator does this math live once you know your real stop distance.</p>
+
+    <h3>Taking profit &amp; trailing</h3>
+    <p>Once a trade is working, the general approach is to bank part of the gain into the first big vertical
+      move — locking in some strength rather than waiting for a pullback that might not come — then trail the
+      remainder using a moving-average break as the exit signal. The 10-day EMA gives the fastest, tightest trail;
+      the 20-day EMA gives a looser one that rides out more noise. Either way, exit the remaining position when
+      price closes decisively below whichever MA you're using to trail. There's no fixed profit target — the
+      trail is what lets a genuinely strong move keep running instead of capping it artificially.</p>
+
+    <h3>Invalidation — when to just get out</h3>
+    <ul>
+      <li><strong>Breakout / EP:</strong> a close back below the breakout level or the low of the base means the
+        setup failed. Exit — don't average down or "give it room."</li>
+      <li><strong>Parabolic Short:</strong> a new high after you're in means the squeeze isn't done. Cover, don't
+        hold through it hoping for a top.</li>
+      <li><strong>Parabolic Long:</strong> a failure to hold the reversal (a new low below the reversal-day low)
+        means the crash wasn't actually done bottoming.</li>
+    </ul>
+  </section>
+
+  <section id="quickref">
+    <h2>Quick reference — all four setups</h2>
+    <table class="flags">
+      <tr><th>Setup</th><th>Core idea</th><th>Entry trigger</th><th>Stop</th><th>Biggest risk</th></tr>
+      <tr><td><strong>Breakout</strong></td>
+          <td>Prior move + tight base + break on volume</td>
+          <td>Break of consolidation high, on volume</td>
+          <td>Low of breakout day / low of base</td>
+          <td>False breakout, back into the range</td></tr>
+      <tr><td><strong>Episodic Pivot</strong></td>
+          <td>Catalyst-driven gap on heavy volume, not already extended</td>
+          <td>Gap day, or the pause right after it</td>
+          <td>Low of gap day / pivot low</td>
+          <td>Gap gets fully filled — news wasn't as good as it looked</td></tr>
+      <tr><td><strong>Parabolic Short</strong></td>
+          <td>Extreme, fast, overextended move likely to mean-revert</td>
+          <td>First confirmed break of trend, not the extension itself</td>
+          <td>New high above your entry / recent extreme</td>
+          <td>Squeeze continues further than seems rational</td></tr>
+      <tr><td><strong>Parabolic Long</strong></td>
+          <td>Crash + stretch, followed by a reversal candle</td>
+          <td>The reversal day itself, or next-day confirmation</td>
+          <td>Low of the reversal day</td>
+          <td>"Reversal" is just a bounce inside a continuing downtrend</td></tr>
+    </table>
+  </section>
+
+  <section id="pitfalls">
+    <h2>Common pitfalls</h2>
+    <ul>
+      <li><strong>High score ≠ confirmed setup.</strong> The 0-100 scores measure momentum/position/volume shape.
+        They don't (fully) measure chart quality — that's what 2LYNCH is for on Breakout, and what your own eyes
+        are for everywhere else.</li>
+      <li><strong>SEC-sourced universe is noisier than Nasdaq Trader's.</strong> If your scan used the SEC fallback
+        source, a handful of OTC/foreign-listed names can slip through even after cleanup — the liquidity filters
+        catch most of them, but double-check anything unfamiliar.</li>
+      <li><strong>Delayed/EOD data.</strong> This is not a real-time feed — treat every candidate as "worth
+        checking," not "actionable right now," especially intraday.</li>
+      <li><strong>Market regime matters more than any single score.</strong> The same score means something
+        different in a bullish vs. bearish tape — see the Market Regime section above.</li>
+      <li><strong>This is Stage 1 only.</strong> Always confirm on the actual chart (Stage 2) before acting — see
+        the Overview section above.</li>
+    </ul>
+  </section>
+
+  <div class="toolbar">
+    <a href="dashboard_latest.html" class="btn btn-primary">⬅ Back to latest scan</a>
+  </div>
+
+  <footer>Not financial advice. This scanner and guide approximate a discretionary trading method using numeric
+    proxies — treat every output as a starting point for your own research, not a signal to act on directly.</footer>
+
+</body>
+</html>
