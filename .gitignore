@@ -1,0 +1,23 @@
+# Secrets - never commit your real Alpaca keys
+alpaca_config.json
+
+# Scan output (regenerated every run - dated CSV + HTML dashboard + recent_triggers.json)
+scan_results/
+
+# Universe cache (regenerated monthly via refresh_universe.py, large + user-specific)
+universe_cache.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+build/
+dist/
+
+# OS junk
+.DS_Store
+Thumbs.db
