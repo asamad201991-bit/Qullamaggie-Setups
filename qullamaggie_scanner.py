@@ -1880,3 +1880,16 @@ if __name__ == "__main__":
             except Exception:
                 pass
 
+# === TELEGRAM AUTO-SEND ===
+import os as _os, glob as _glob, csv as _csv, requests as _requests
+try:
+    _files = sorted(_glob.glob('/opt/render/project/src/scan_results/qullamaggie_scan_*.csv'))
+    if _files:
+        with open(_files[-1]) as _f:
+            _rows = list(_csv.DictReader(_f))
+        _hits = [r for r in _rows if float(r.get('best_score') or 0) >= 75]
+        _msg = f"Qullamaggie Scan: {len(_hits)} hits >= 75\n\n" + "\n".join(f"{r['ticker']} | score {r['best_score']} | ${r['close']}" for r in _hits[:20])
+        _r = _requests.post(f"https://api.telegram.org/bot{_os.environ.get('TELEGRAM_BOT_TOKEN')}/sendMessage", data={'chat_id': _os.environ.get('TELEGRAM_CHAT_ID'), 'text': _msg})
+        print(f"Telegram sent: {_r.status_code}")
+except Exception as _e:
+    print(f"Telegram error: {_e}")
