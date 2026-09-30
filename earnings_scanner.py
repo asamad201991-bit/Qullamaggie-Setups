@@ -95,21 +95,17 @@ for e in priced:
 # === VALIDATION FILTER ===
 def is_valid(e):
     pos = e.get("52w_pos")
-    # 52W position must exist and be a real number
     if pos is None or pos < 0 or pos > 100:
         return False
-    # Hard filter: no value candidates near 52W high
-    if pos > 75:
+    # Hard filter: no value candidates above 55% of 52W range
+    if pos > 55:
         return False
-    # Bad P/E data
     pe = e.get("pe")
     if pe is not None and pe <= 0:
         return False
-    # Shell / explosive-off-zero revenue
     rg = e.get("rev_growth")
     if rg is not None and rg > 500:
         return False
-    # Dead stock — no trading activity
     vr = e.get("vol_ratio")
     if vr is not None and vr < 0.4:
         return False
@@ -130,32 +126,30 @@ def score(e):
         s += 28
     elif pos <= 50:
         s += 20
-    elif pos <= 65:
-        s += 12
     else:
-        s += 5
+        s += 12
 
-    # Revenue growth (0-20): cap at 100% for full credit
+    # Revenue growth (0-20): flat or negative gets 0
     rg = e.get("rev_growth")
     if rg is not None:
         if 10 <= rg <= 100:
             s += 20
-        elif 0 <= rg < 10:
-            s += 12
+        elif 5 <= rg < 10:
+            s += 10
         elif 100 < rg <= 500:
             s += 8
-        # negative rev_growth: 0
+        # 0-5% or negative: 0 points
 
     # EPS growth (0-20): cap at 200% for full credit
     eg = e.get("eps_growth")
     if eg is not None:
         if 10 <= eg <= 200:
             s += 20
-        elif 0 <= eg < 10:
-            s += 12
-        elif 200 < eg:
+        elif 5 <= eg < 10:
+            s += 10
+        elif eg > 200:
             s += 8
-        # negative eps_growth: 0
+        # 0-5% or negative: 0 points
 
     # P/E (0-15): lower = better
     pe = e.get("pe")
