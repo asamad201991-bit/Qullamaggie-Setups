@@ -8,7 +8,7 @@ DAYS_MIN = 30
 DAYS_MAX = 90
 MAX_RESULTS = 20
 MAX_PER_DATE = 3
-MAX_CANDIDATES = 200
+MAX_CANDIDATES = 300
 FINNHUB_KEY = os.environ.get("FINNHUB_API_KEY")
 
 # === RATE-LIMITED FINNHUB CALL ===
@@ -68,14 +68,14 @@ for e in priced:
     e["52w_high"] = m.get("52WeekHigh")
     e["52w_low"] = m.get("52WeekLow")
     e["pe"] = m.get("peTTM")
-    e["pb"] = m.get("pb")
     e["rev_growth"] = m.get("revenueGrowthTTMYoy")
     e["eps_growth"] = m.get("epsGrowthTTMYoy")
 
 # === FETCH VOLUME TREND via yfinance ===
 for e in priced:
     try:
-        df = yf.Ticker(e["symbol"]).history(period="3mo", interval="1d")
+        yf_symbol = e["symbol"].replace(".", "-")
+        df = yf.Ticker(yf_symbol).history(period="3mo", interval="1d")
         if df is not None and len(df) >= 25:
             v20 = float(df["Volume"].tail(20).mean())
             v90 = float(df["Volume"].mean())
@@ -89,50 +89,103 @@ for e in priced:
     high, low, price = e.get("52w_high"), e.get("52w_low"), e.get("price")
     if high and low and price and high > low:
         e["52w_pos"] = round((price - low) / (high - low) * 100, 1)
-        e["pct_below_high"] = round((high - price) / high * 100, 1)
     else:
         e["52w_pos"] = None
-        e["pct_below_high"] = None
+
+# === VALIDATION FILTER ===
+def is_valid(e):
+    pos = e.get("52w_pos")
+    # 52W position must exist and be a real number
+    if pos is None or pos < 0 or pos > 100:
+        return False
+    # Hard filter: no value candidates near 52W high
+    if pos > 75:
+        return False
+    # Bad P/E data
+    pe = e.get("pe")
+    if pe is not None and pe <= 0:
+        return False
+    # Shell / explosive-off-zero revenue
+    rg = e.get("rev_growth")
+    if rg is not None and rg > 500:
+        return False
+    # Dead stock — no trading activity
+    vr = e.get("vol_ratio")
+    if vr is not None and vr < 0.4:
+        return False
+    return True
+
+valid = [e for e in priced if is_valid(e)]
+print(f"After validation filter: {len(valid)}")
 
 # === SCORING (0-100) ===
 def score(e):
     s = 0
+
+    # 52W position (0-35): lower = better
     pos = e.get("52w_pos")
-    if pos is not None:
-        if pos <= 15: s += 35
-        elif pos <= 30: s += 28
-        elif pos <= 50: s += 20
-        elif pos <= 70: s += 10
+    if pos <= 15:
+        s += 35
+    elif pos <= 30:
+        s += 28
+    elif pos <= 50:
+        s += 20
+    elif pos <= 65:
+        s += 12
+    else:
+        s += 5
+
+    # Revenue growth (0-20): cap at 100% for full credit
     rg = e.get("rev_growth")
     if rg is not None:
-        if rg >= 20: s += 20
-        elif rg >= 10: s += 15
-        elif rg >= 0: s += 10
+        if 10 <= rg <= 100:
+            s += 20
+        elif 0 <= rg < 10:
+            s += 12
+        elif 100 < rg <= 500:
+            s += 8
+        # negative rev_growth: 0
+
+    # EPS growth (0-20): cap at 200% for full credit
     eg = e.get("eps_growth")
     if eg is not None:
-        if eg >= 20: s += 20
-        elif eg >= 10: s += 15
-        elif eg >= 0: s += 10
+        if 10 <= eg <= 200:
+            s += 20
+        elif 0 <= eg < 10:
+            s += 12
+        elif 200 < eg:
+            s += 8
+        # negative eps_growth: 0
+
+    # P/E (0-15): lower = better
     pe = e.get("pe")
     if pe is not None and pe > 0:
-        if pe <= 15: s += 15
-        elif pe <= 25: s += 10
-        elif pe <= 40: s += 5
+        if pe <= 15:
+            s += 15
+        elif pe <= 25:
+            s += 10
+        elif pe <= 40:
+            s += 5
+
+    # Volume (0-10): reward rising volume, neutral on drying up
     vr = e.get("vol_ratio")
     if vr is not None:
         s += 5
-        if vr >= 1.2: s += 5
-        elif vr <= 0.7: s += 3
+        if vr >= 1.2:
+            s += 5
+        elif 0.7 <= vr < 1.2:
+            s += 2
+
     return s
 
-for e in priced:
+for e in valid:
     e["score"] = score(e)
 
 # === SORT, CAP PER DATE ===
-priced.sort(key=lambda x: x["score"], reverse=True)
+valid.sort(key=lambda x: x["score"], reverse=True)
 final = []
 date_counts = {}
-for e in priced:
+for e in valid:
     d = e["date"]
     if date_counts.get(d, 0) >= MAX_PER_DATE:
         continue
@@ -148,7 +201,7 @@ else:
     lines = [f"Earnings Scanner ({today})", f"{len(final)} candidates (${PRICE_MIN}-${PRICE_MAX})", ""]
     for e in final:
         pe_str = f"PE:{e['pe']:.0f}" if e.get("pe") else "PE:-"
-        pos_str = f"52W:{e['52w_pos']:.0f}%" if e.get("52w_pos") is not None else "52W:-"
+        pos_str = f"52W:{e['52w_pos']:.0f}%"
         vr_str = f"V:{e['vol_ratio']:.1f}x" if e.get("vol_ratio") else "V:-"
         rg = e.get("rev_growth")
         eg = e.get("eps_growth")
