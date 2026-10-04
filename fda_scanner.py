@@ -1,13 +1,13 @@
 import os, json, requests, datetime
-from alpaca.data.historical import StockHistoricalDataClient
-from alpaca.data.requests import StockLatestTradeRequest
 
 # === CONFIG ===
+PRICE_MIN = 1.0
 PRICE_MAX = 50.0
 DAYS_MIN = 25
 DAYS_MAX = 90
 MAX_RESULTS = 15
 PIPEWORX_URL = "https://gateway.pipeworx.io/regulatory-catalysts/mcp"
+FINNHUB_KEY = os.environ.get("FINNHUB_API_KEY")
 
 # === FETCH PDUFA DATA ===
 payload = {"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "pdufa_catalysts", "arguments": {}}, "id": 1}
@@ -29,26 +29,27 @@ for e in events:
         continue
     days_out = (d - today).days
     if DAYS_MIN <= days_out <= DAYS_MAX:
-        filtered.append({**e, "days_out": days_out, "pdufa_date_obj": d})
+        filtered.append({**e, "days_out": days_out})
 print(f"After date filter ({DAYS_MIN}-{DAYS_MAX} days): {len(filtered)}")
 
-# === FETCH PRICES FROM ALPACA ===
-cfg = json.load(open("/opt/render/project/src/alpaca_config.json"))
-client = StockHistoricalDataClient(cfg["api_key"], cfg["secret_key"])
+# === FETCH PRICES FROM FINNHUB ===
+def finnhub_quote(ticker):
+    try:
+        url = f"https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}"
+        r = requests.get(url, timeout=15)
+        return r.json().get("c")
+    except Exception:
+        return None
 
 priced = []
 for e in filtered:
     ticker = e.get("ticker")
     if not ticker:
         continue
-    try:
-        tr = client.get_stock_latest_trade(StockLatestTradeRequest(symbol_or_symbols=ticker))
-        price = float(tr[ticker].price)
-        if price <= PRICE_MAX:
-            priced.append({**e, "price": price})
-    except Exception:
-        continue
-print(f"After price filter (<= ${PRICE_MAX}): {len(priced)}")
+    price = finnhub_quote(ticker)
+    if price and PRICE_MIN <= price <= PRICE_MAX:
+        priced.append({**e, "price": price})
+print(f"After price filter (${PRICE_MIN}-${PRICE_MAX}): {len(priced)}")
 
 # === SORT AND TRIM ===
 priced.sort(key=lambda x: x["days_out"])
